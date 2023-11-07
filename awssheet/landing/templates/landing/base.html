@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css" />
+    
+  
+    
+    <!-- Additional Styles -->
+    <style>
+      .hot-container {
+        width: 100%;
+      }
+      .navbar-nav a:hover {
+        color: #fff;
+        background-color: #007bff;
+        border-radius: 5px;
+      }
+      .logout-button {
+        border: none;
+        background-color: #f8f9fa;
+        cursor: pointer;
+      }
+      .logout-button:hover {
+        color: #007bff;
+      }
+    </style>
+
+<!--Style for Zone selection-->
+<style>
+  body {
+      font-family: 'Arial, sans-serif';
+      background-color: #f8f9fa;
+      color: #343a40;
+  }
+  .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 20px;
+    }
+
+    .multi-select-container {
+        position: relative;
+        width: 300px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        background-color: #ffffff;
+        color: #495057;
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+
+    .multi-select-container ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        max-height: 200px;
+        overflow-y: scroll;
+        display: none;
+        position: absolute;
+        top: 45px;
+        width: 100%;
+        border: 1px solid #ced4da;
+        background: #fff;
+        z-index: 1000;
+    }
+
+    .multi-select-container ul li {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    .multi-select-container ul li:hover {
+        background-color: #f1f1f1;
+    }
+
+    .multi-select-container ul li.selected {
+        background-color: #e9ecef;
+    }
+
+    .multi-select-container > div {
+        cursor: pointer;
+    }
+
+    .btn-group {
+        display: flex;
+        align-items: center;
+    }
+
+    .btn-group .form-group {
+        margin-right: 20px;
+    }
+</style>
+
+    <title>{{ heading }}</title>
+  </head>
+  <body>
+    <header>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/">iAWS</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#">Home</a>
+              </li>
+              <!-- Add links to other pages here -->
+              <li class="nav-item">
+                <a class="nav-link" href="/s3">S3</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/ec2">EC2</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/rds">RDS</a>
+              </li>
+            </ul>
+            <div class="container">
+         
+              <div class="multi-select-container" onclick="toggleDropdown()">
+              <div id="selectedZone">Select Regions</div>
+              <ul id="zoneList">
+
+                  {% for zone in get_regions %}
+                      <li data-value="{{ zone }}" onclick="toggleSelection(event, '{{ zone }}')">{{ zone }}</li>
+                  {% endfor %}
+              </ul>
+          </div>
+        </div>
+            <div class="btn-group" role="group" aria-label="Data Management">
+              <div class="form-group mr-5">
+                <input id="searchgrid" type="text" class="form-control input-lg" placeholder="Search..." />
+              </div>
+              <button id="refresh-button" class="btn btn-secondary" data-toggle="tooltip" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+              <button id="import-file" class="btn btn-secondary" data-toggle="tooltip" title="Import"><i class="fas fa-file-import"></i></button>
+              <button id="export-file" class="btn btn-secondary" data-toggle="tooltip" title="Export"><i class="fas fa-file-export"></i></button> 
+            </div>
+
+
+            <form action="{% url 'landing:aws_logout' %}" method="post" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-danger ms-3">Logout</button>
+            </form>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-light text-center py-3">
+      <!-- Add your footer content here -->
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Additional Scripts -->
+    <script>
+      function showSuccessMessage() {
+        $('#success-message').show();
+        setTimeout(function() {
+          $('#success-message').hide();
+        }, 5000);
+      }
+
+      function postData(url, data, action) {
+        console.log("POST URL", url);
+        console.log("POST DATA", data);
+        return $.ajax({
+          url: url,
+          type: action,
+          data: data,
+          headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+          success: function (response) {
+            showSuccessMessage();
+            console.log("POST SUCCESS", response);
+            location.reload(); 
+          },
+          error: function (request, status, error) {
+            alert(request.responseText);
+          }
+        });
+      }
+    </script>
+      <script>
+        $(document).ready(function(){
+          $('[data-toggle="tooltip"]').tooltip(); 
+        });
+      </script>
+
+<!-- zone selection-->
+<script>
+  let selectedZones = [];
+
+  function toggleDropdown() {
+      const zoneList = document.getElementById('zoneList');
+      zoneList.style.display = zoneList.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function toggleSelection(event, value) {
+    event.stopPropagation();
+    const element = event.target;
+    if (selectedZones.includes(value)) {
+        selectedZones = selectedZones.filter(zone => zone !== value);
+        element.classList.remove('selected');
+    } else {
+        selectedZones.push(value);
+        element.classList.add('selected');
+    }
+
+    // Update this part to display all selected values
+    document.getElementById('selectedZone').innerText = selectedZones.join(', ');
+
+    console.log('Selected zones:', selectedZones);
+}
+
+</script>
+
+<!--Export CSV-->
+<script>
+  var button1 = document.getElementById('export-file');
+  var exportPlugin1 = hot.getPlugin('exportFile');
+
+   button1.addEventListener('click', function() {
+    exportPlugin1.downloadFile('csv', {
+    bom: false,
+    columnDelimiter: ',',
+  //  columnHeaders: false,
+   // exportHiddenColumns: true,
+    exportHiddenRows: true,
+    fileExtension: 'csv',
+    filename: 'CSV-file_[YYYY]-[MM]-[DD]',
+    mimeType: 'text/csv',
+    rowDelimiter: '\r\n',
+    rowHeaders: true,
+    columnHeaders:true
+  });
+});
+</script>
+
+
+<!-- Search block-->
+<script>
+document.getElementById('searchgrid').addEventListener('keyup', function() {
+  var query = this.value.toLowerCase();
+  var filteredData = data.filter(function(row) {
+    return Object.values(row).some(function(value) {
+      return value && value.toString().toLowerCase().includes(query);
+    });
+  });
+  hot.loadData(filteredData);
+});
+</script>
+
+  </body>
+</html>
