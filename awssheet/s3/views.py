@@ -4,7 +4,9 @@ from django.template import loader
 from django.contrib import messages
 from s3.s3 import list_s3_bucket,create_s3_bucket,list_s3_bucket_cached,remove_s3_bucket
 from django.conf import settings
+import logging
 
+logger = logging.getLogger(__name__)
 # Create your views here.
 from landing.decorators import aws_login_required
 
@@ -28,7 +30,7 @@ def f_createS3_bucket(request):
     AWS_REGION=settings.AWS_REGION_NAME
     bucketName = request.POST.get('bucketName')
     print(type(bucketName))
-    create_s3_bucket(bucketName,aws_access_key_id,aws_secret_access_key)
+    create_s3_bucket(bucketName,aws_access_key_id,aws_secret_access_key,AWS_REGION)
     messages.success(request, f'Successfully created bucket {bucketName}.')
     return redirect('index')
 
