@@ -1,4 +1,3 @@
 django
 awscli
 boto3 
-django
