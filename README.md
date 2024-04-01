@@ -14,6 +14,10 @@ In summary, the integration of an HTML table to delineate AWS resources can rema
 
 Deploy and run the AWSSheet Django application using Podman, a daemonless container engine.
 
+## NOTE
+
+You can't sell this product to anyone without approval from IADS LTD (UK)
+
 ## Prerequisites
 
 - Podman installed on your system (check with `podman --version`)
