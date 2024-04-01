@@ -1,0 +1,8 @@
+
+<!-- chatgpt_logs/templates/chatgpt_logs/create_command.html -->
+<h2>Create Command</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Send Command</button>
+</form>

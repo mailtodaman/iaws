@@ -1,0 +1,204 @@
+<!-- terminal.html -->
+
+<style>
+    #aiterminal {
+        background-color: white; /* White background */
+        color: #212529; /* Black text color */
+        padding: 10px; /* Reduced padding */
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    #aicommandInput {
+        background-color: #f8f9fa; /* Bootstrap light color */
+        color: #212529; /* Black text color */
+        border: 1px solid #ced4da; /* Bootstrap border color */
+        height: 25px;
+        padding-inline: 1px;
+        padding-block: 1px;
+    }
+
+    #aioutput {
+        white-space: pre-wrap;
+        max-height: 800px;
+        overflow-y: auto;
+        background-color: #f8f9fa; /* Bootstrap light color */
+        margin-top: 10px; /* Reduced margin */
+        padding: 5px; /* Reduced padding */
+        border: 1px solid #ced4da; /* Bootstrap border color */
+    
+    }
+
+    .aicommand-line {
+        color: #28a745; /* Bootstrap success color */
+    }
+
+    #aiexecuteCommand {
+        background-color: #6c757d; /* Bootstrap secondary color */
+        color: #ffffff; /* White text color */
+        border-color: #495057; /* Bootstrap tertiary color */
+        height: 25px;
+        line-height: 1px;
+        margin-left: 5px;
+        font-size: 15px;
+    }
+
+    #aiexecuteCommand:focus {
+        background-color: #007bff; /* Bootstrap primary color */
+        color: #000000; /* Black text color */
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5); /* Bootstrap focus color */
+    }
+
+    #aiexecuteCommand:hover {
+        background-color: #0056b3; /* Darker shade of primary color on hover */
+        color: #ffffff; /* White text color */
+    }
+
+    .ai-side-bar {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 30%; /* Adjust width as needed */
+        background-color: #caced1; /* Bootstrap dark color */
+        color: white;
+        text-align: left;
+        height: 100%; /* Adjust height to fill the screen, or as needed */
+        transition: transform 0.3s ease; /* Animate the transform property */
+        transform: translateX(-100%); /* Initially hide the panel off-screen to the left */
+        z-index: 1000; /* Ensure it's above other content */
+    }
+
+    .ai-side-bar.active {
+        transform: translateX(0%); /* Slide in */
+    }
+
+    .input-group-append {
+         margin-right: 5px; /* Adjusted margin */
+    }
+
+    .loader {
+        border: 4px solid #f3f3f3; /* Light grey */
+        border-top: 4px solid #007bff; /* Bootstrap primary color */
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite; /* Apply animation */
+        margin: 0 auto; /* Center the loader */
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Hide the loader when not active */
+    .loader.hidden {
+        display: none;
+    }
+</style>
+
+
+<footer class="ai-side-bar">
+
+    <div class="container-fluid mt-3">
+        <div class="row">
+            <div class="col-12">
+                <div id="aiterminal">
+                    <!-- Command Input at the Top -->
+                    <div class="input-group mb-3">
+                        <input type="text" id="aicommandInput" class="form-control" placeholder="Enter command" required>
+                      
+                        <div class="input-group-append">
+                            <button id="aiexecuteCommand" class="btn btn-outline-light" type="button">Execute</button>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" >
+                            <!-- <label class="form-check-label" for="flexSwitchCheckChecked">Checked switch checkbox input</label> -->
+                        </div>
+                    </div>
+                    
+                    <!-- Output Div -->
+                    <div id="aioutput"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+<script>
+    document.getElementById('aiexecuteCommand').addEventListener('click', function() {
+    var aicommandInput = document.getElementById('aicommandInput');
+    var aicommand = aicommandInput.value; // Get the current value of the command input
+    var checkbox = document.getElementById('flexSwitchCheckChecked');
+    var aioutputDiv = document.getElementById('aioutput');
+    
+    // Append Handsontable data to the command if the checkbox is checked
+    if (checkbox.checked) {
+        var handsontableData = getHandsontableData(); // Assuming this function gets your data
+        aicommand += handsontableData; // Append data to the command for execution
+    }
+
+    // Display loading animation while waiting for response
+    aioutputDiv.innerHTML = '<div class="loader"></div>' + aioutputDiv.innerHTML;
+
+    // Show loader animation
+    document.querySelector('.loader').classList.remove('hidden');
+
+    fetch('/execute-ai-command/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 'aicommand': aicommand }) // Send the modified command
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Hide loader animation when response is received
+        document.querySelector('.loader').classList.add('hidden');
+        
+        // Display the result once it's received
+        aioutputDiv.innerHTML = '<div><span class="text-primary">AI: ' + aicommandInput.value + '</span></div><div>' + data.aioutput + '</div>' + aioutputDiv.innerHTML;
+    })
+    .catch(error => {
+        // Hide loader animation in case of error
+        document.querySelector('.loader').classList.add('hidden');
+        
+        // Display error message if request fails
+        aioutputDiv.innerHTML = '<div class="error">Error: ' + error + '</div>' + aioutputDiv.innerHTML;
+    });
+    
+    aicommandInput.value = ''; // Clear the input field
+});
+
+    
+    // Function to get Handsontable data (example implementation)
+    function getHandsontableData() {
+        // Replace this with your actual logic to retrieve data from Handsontable
+      
+        return hotInstance.getData();
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+
+    
+
+
+
+

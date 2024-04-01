@@ -1,0 +1,81 @@
+{% extends 'landing/base.html' %}
+
+{% block content %}
+{% load static %}
+
+<style>
+.chart-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.chart-item {
+    flex: 1 1 300px; /* Adjust the min-width of the chart items */
+    margin: 10px;
+    box-sizing: border-box;
+}
+</style>
+
+<div class="container-fluid mt-4">
+    <div class="badge-container mb-4 d-flex flex-wrap">
+        {% for chart in charts_data %}
+            {% if chart.is_badge %}
+                <div class="badge bg-primary text-wrap m-1" style="width: 6rem;">
+                    {{ chart.title }}: {{ chart.data|first }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="chart-container">
+        {% for chart in charts_data %}
+            {% if not chart.is_badge %}
+                <div class="chart-item">
+                    <div class="card my-2">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ chart.title }}</h5>
+                            <canvas id="{{ chart.id }}"></canvas>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<script src="{% static 'landing/js/chart4.4.1.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% for chart in charts_data %}
+            {% if not chart.is_badge %}
+                var ctx = document.getElementById('{{ chart.id }}');
+                var labels = {{ chart.labels|default:"[]"|safe }};
+                var data = {{ chart.data|default:"[]"|safe }};
+                new Chart(ctx, {
+                    type: '{{ chart.type }}',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '{{ chart.label }}',
+                            data: data,
+                            backgroundColor: '{{ chart.borderColor }}',
+                            borderColor: '{{ chart.borderColor }}',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            {% endif %}
+        {% endfor %}
+    });
+</script>
+{% endblock %}

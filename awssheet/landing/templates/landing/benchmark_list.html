@@ -1,0 +1,81 @@
+{% extends 'landing/base.html' %}
+{% block content %}
+{{data|safe}} 
+
+<style>
+    .category-card {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+        margin-bottom: 20px;
+        border-radius: 0.25rem;
+        background-color: #f8f9fa;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; /* Ensures content is evenly spaced */
+        height: 100%; /* Ensures all cards have the same height */
+    }
+
+    .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .category-title {
+        padding: 10px;
+        text-align: center;
+    }
+
+    .card-flex-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .card-flex-item {
+        margin: 5px;
+        flex: 1 0 calc(25% - 10px); /* Adjust for four items per row */
+    }
+
+    @media (max-width: 992px) {
+        .card-flex-item {
+            flex: 1 0 calc(33.333% - 10px); /* Three items per row on medium screens */
+        }
+    }
+
+    @media (max-width: 768px) {
+        .card-flex-item {
+            flex: 1 0 calc(50% - 10px); /* Two items per row on small screens */
+        }
+    }
+
+    @media (max-width: 576px) {
+        .card-flex-item {
+            flex: 1 0 100%; /* One item per row on extra small screens */
+        }
+    }
+</style>
+
+
+
+<div class="container my-5">
+    <h1 class="text-center">{{platform_name}} Benchmark</h1>
+
+    {% if categories %}
+        <div class="card-flex-container">
+            {% for key,value in categories.items %}
+                <div class="card-flex-item col-lg-2 col-md-4 col-sm-12 mb-4">
+                    <div class="card category-card">
+                        <div class="card-body">
+                            <h5 class="category-title"><a href="{% url 'landing:benchmark_report' platform_name key %}" target="_blank" class="stretched-link">{{ value }}</a></h5>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+
+
+{% endblock %}

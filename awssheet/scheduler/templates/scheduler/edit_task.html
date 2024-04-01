@@ -1,0 +1,29 @@
+<!-- scheduler/templates/scheduler/edit_task.html -->
+
+{% extends 'scheduler/s_base.html' %}
+
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'scheduler/css/scheduler_styles.css' %}" type="text/css">
+<div class="schedule">
+  
+        <header>
+            <nav >
+                <ul>
+                    <li><a href="{% url 'list_tasks' %}">List Tasks</a></li>
+                    <li><a href="{% url 'add_task' %}">Add New Task</a></li>
+                    <!-- Add more navigation links as needed -->
+                </ul>
+            </nav>
+        </header>
+  
+
+<div class="form-container">
+    <h2>Edit Task: {{ task.name }}</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save Changes</button>
+</form>
+</div>
+{% endblock %}

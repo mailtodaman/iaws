@@ -1,0 +1,49 @@
+{% extends 'scheduler/s_base.html' %}
+
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'scheduler/css/scheduler_styles.css' %}" type="text/css">
+<div class="schedule">
+<header>
+    <nav >
+        <ul>
+            <li><a href="{% url 'list_tasks' %}">List Tasks</a></li>
+            <li><a href="{% url 'add_task' %}">Add New Task</a></li>
+            <!-- Add more navigation links as needed -->
+        </ul>
+    </nav>
+</header>
+</div>
+<h2>Job List</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Command</th>
+            <th>Schedule</th>
+            <th>Jobs</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for task in tasks %}
+        <tr>
+            <td>{{ task.name }}</td>
+            <td>{{ task.command }}</td>
+            <td>{{ task.schedule }}</td>
+            <td><a href="{% url 'task_detail' task.id %}">View Details</a></td>
+            <td>
+                <a href="{% url 'edit_task' task.id %}">Edit</a>
+                <!-- Delete Task Form -->
+                <form action="{% url 'delete_scheduled_task' task.id %}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this task?');">
+                    {% csrf_token %}
+                    <button type="submit" style="background: none; border: none; color: red; text-decoration: underline; cursor: pointer; padding: 0; margin-left: 10px;">
+                        Delete
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

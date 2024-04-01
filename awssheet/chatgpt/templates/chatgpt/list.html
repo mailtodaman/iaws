@@ -1,0 +1,191 @@
+<!-- chatgpt_logs/templates/chatgpt_logs/list_commands.html -->
+{% extends "landing/base.html" %}
+{% block content %}
+{% load static %}
+<style>
+.highlight {
+    background-color: yellow;
+    
+}
+/* Add this to your custom.css or within a <style> block */
+th label {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Adjust the space between the checkbox and the text as needed */
+}
+
+th label input[type="checkbox"] {
+    margin-top: 0; /* Adjusts alignment if needed */
+}
+
+</style>
+<link rel="stylesheet" href="{% static 'css/custom.css' %}"> <!-- Link to your custom CSS if needed -->
+
+<h2 class="mb-4 text-center">List of ChatGPT Queries</h2>
+
+<div class="row mb-3">
+    <div class="col-md-12"> <!-- Use the full width -->
+        <div class="d-flex justify-content-between"> <!-- Outer flex container -->
+
+            <!-- Centered search and options -->
+            <div class="mx-auto">
+                <form id="searchForm" class="d-flex justify-content-center">
+                    <input id="searchQuery" class="form-control me-2" type="search" name="q" placeholder="Search commands..." value="{{ query }}" aria-label="Search">
+                    <select class="form-select me-2" name="rows" onchange="submitForm()">
+                        <option value="10" {% if rows == "10" %}selected{% endif %}>10 rows</option>
+                        <option value="20" {% if rows == "20" %}selected{% endif %}>20 rows</option>
+                        <option value="50" {% if rows == "50" %}selected{% endif %}>50 rows</option>
+                    </select>
+                </form>
+            </div>
+
+            <!-- Right-aligned Delete Button -->
+            <div>
+                <button type="submit" form="deleteForm" class="btn btn-danger" onclick="return confirmDelete();">Delete Selected</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+<form id="deleteForm" method="post" action="{% url 'delete_logs' %}">
+    {% csrf_token %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-info">
+                <tr>
+                    <th>Username</th>
+                    <th>Command</th>
+                    <th>Result</th>
+                    <th>Date</th>
+                    <th>
+                        <label>
+                            <input type="checkbox" id="selectAll" aria-label="Select All">
+                            Delete
+                        </label>
+                    </th> <!-- Moved to the right -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log.username }}</td>
+                    <td>{{ log.command }}</td>
+                    <td>{{ log.result }}</td>
+                    <td>{{ log.created_at }}</td>
+                    <td><input type="checkbox" name="selected_logs" value="{{ log.id }}" class="log-checkbox"></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">No commands found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</form>
+
+
+<nav aria-label="Page navigation">
+    <ul class="pagination">
+        {% if logs.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page=1&rows={{ rows }}&q={{ query }}">First</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ logs.previous_page_number }}&rows={{ rows }}&q={{ query }}">Previous</a></li>
+        {% endif %}
+        <li class="page-item disabled"><a class="page-link">Page {{ logs.number }} of {{ logs.paginator.num_pages }}</a></li>
+        {% if logs.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ logs.next_page_number }}&rows={{ rows }}&q={{ query }}">Next</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ logs.paginator.num_pages }}&rows={{ rows }}&q={{ query }}">Last</a></li>
+        {% endif %}
+    </ul>
+</nav>
+
+<script>
+    $(document).ready(function() {
+        // Function to submit the search form
+        function submitForm() {
+            document.getElementById("searchForm").submit();
+        }
+
+        // Dynamic searching
+        $("#searchQuery").on("keyup", function() {
+            clearTimeout(window.timer);
+            window.timer = setTimeout(function() {
+                fetchResults($("#searchQuery").val(), $("select[name='rows']").val());
+            }, 500); // Adjust delay as needed
+        });
+
+        // Changing rows per page
+        $("select[name='rows']").on("change", function() {
+            fetchResults($("#searchQuery").val(), $(this).val());
+        });
+
+        // Fetch results and update table with AJAX
+        function fetchResults(query, rows) {
+            $.ajax({
+                url: "{% url 'list' %}",  // Ensure this URL points to your view
+                type: "GET",
+                data: {
+                    q: query,
+                    rows: rows,
+                },
+                success: function(data) {
+                    $("table tbody").html(data.html);
+                    highlightSearchTerm(query); // Call highlight function here
+                },
+                error: function(xhr, status, error) {
+                    console.error("An error occurred:", error);
+                }
+            });
+        }
+
+        // Highlight matching search term
+        function highlightSearchTerm(searchTerm) {
+            // Remove previous highlights
+            $('tbody').find('tr').each(function() {
+                $(this).children('td:not(:last-child)').each(function() { // Skip the last column (checkboxes)
+                    $(this).html($(this).text());
+                });
+            });
+
+            // If there's no search term, don't highlight anything
+            if (!searchTerm) {
+                return;
+            }
+
+            // Split the search term into individual words and escape special characters
+            var terms = searchTerm.split(/\s+/).filter(function(t) { return t.length > 0; }).map(function(t) {
+                return t.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            });
+
+            // Highlight each term separately
+            terms.forEach(function(term) {
+                var regex = new RegExp('(' + term + ')', 'gi');
+                $('tbody').find('tr').each(function() {
+                    $(this).children('td:not(:last-child)').each(function() {
+                        $(this).html($(this).html().replace(regex, '<span class="highlight">$1</span>'));
+                    });
+                });
+            });
+        }
+
+
+        // Select all checkboxes
+        $("#selectAll").click(function() {
+            $('.log-checkbox').prop('checked', this.checked);
+        });
+
+        // Confirm deletion
+        function confirmDelete() {
+            var selected = $('.log-checkbox:checked').length;
+            return selected > 0 ? confirm('Are you sure you want to delete the selected items? This action cannot be undone.') : false;
+        }
+
+        // Initial call to highlight if there's a search term present on page load
+        highlightSearchTerm($("#searchQuery").val());
+    });
+</script>
+    
+{% endblock %}

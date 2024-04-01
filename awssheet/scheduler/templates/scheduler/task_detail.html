@@ -1,0 +1,48 @@
+{% extends 'scheduler/s_base.html' %}
+
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'scheduler/css/styles.css' %}" type="text/css">
+<div class="schedule">
+
+        <header>
+            <nav >
+                <ul>
+                    <li><a href="{% url 'list_tasks' %}">List Tasks</a></li>
+                    <li><a href="{% url 'add_task' %}">Add New Task</a></li>
+                    <!-- Add more navigation links as needed -->
+                </ul>
+            </nav>
+        </header>
+    
+<div class="container">
+    <!-- Task Details -->
+
+    <h3>Execution Results</h3>
+    {% if task.results.exists %}
+    <div class="table-responsive">
+        <table class="results-table">
+            <!-- Table Headers -->
+            <tbody>
+                {% for result in task.results.all %}
+                <tr>
+                    <td>{{ result.execution_time }}</td>
+                    <td>{{ result.result }}</td>
+                    <td>{{ result.status }}</td>
+                    <td>
+                        <!-- Delete Result Button -->
+                        <form action="{% url 'delete_task_result' result.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" onclick="return confirm('Are you sure you want to delete this result?');">Delete Result</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>No results found.</p>
+    {% endif %}
+</div>
+{% endblock %}
