@@ -11,23 +11,112 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-import boto3
+import boto3,os
+import yaml
+import secrets
+import string
+
+
+# def generate_secret_key(length=50):
+#     """Generate a random string of letters, digits, and special characters."""
+#     characters = string.ascii_letters + string.digits + string.punctuation
+#     # Generate a secure random string of the specified length
+#     secret_key = ''.join(secrets.choice(characters) for i in range(length))
+#     return secret_key
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+# IAWS Values
+
+# Replace 'YOUR_ENV_VARIABLE' with the name of the environment variable you want to retrieve
+IAWS_CONFIG_PATH = 'IAWS_CONFIG_PATH'
+
+# Use the 'os.environ' dictionary to access environment variables
+IAWS_CONFIG_PATH = os.environ.get(IAWS_CONFIG_PATH)
+
+if IAWS_CONFIG_PATH is not None:
+    print(f"The value of {IAWS_CONFIG_PATH} is: {IAWS_CONFIG_PATH}")
+else:
+    print(f"{IAWS_CONFIG_PATH} is not set in the environment.")
+
+
+# Define the path to the YAML configuration file
+CONFIG_FILE_PATH = os.path.join(BASE_DIR, IAWS_CONFIG_PATH+'/config.yaml')
+# Read the configuration from the YAML file
+with open(CONFIG_FILE_PATH, 'r') as config_file:
+    config = yaml.safe_load(config_file)
+
+# Define the number of workers from the configuration
+# Default 2
+CONCURRENT_MAX_WORKERS = config.get('concurrent_max_workers', 2)
+GIT_AWS_COMPLIANCE_DIR = config.get('git_aws_compliance_dir','/tmp/steampipe-mod-aws-compliance/')
+GIT_GCP_COMPLIANCE_DIR = config.get('git_gcp_compliance_dir','/tmp/steampipe-mod-gcp-compliance/')
+GIT_AZURE_COMPLIANCE_DIR = config.get('git_azure_compliance_dir','/tmp/steampipe-mod-azure-compliance/')
+DYNAMIC_FORM = config.get('dynamic_form','/home/iaws/dynamic-form.yaml')
+IAWS_DASHBOARD = config.get('dashboard','/home/iaws/dashboard.yaml')
+STEAMPIPE_BENCHMARK_LIST_COMMAND = "steampipe check list"
+# 
+STEAMPIPE_AWS_COMPLIANCE_LIST = "steampipe query list"
+STEAMPIPE_AWS_COMPLIANCES = "steampipe query"
+ALLOWED_COMMANDS = ["date", "aws", "gcloud", "steampipe","ls"]
+CACHE_TIMEOUT = config.get('cache_timeout', 3000)
+# Multiprocessing values
+
+# End IAWS values
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-h_347j(q!o%k53-k3z$90&dx0j^73=($x=6!zx%4fp_%3-cwr5'
+# SECRET_KEY = generate_secret_key()
+# SECRET_KEY = "MY-TEST"
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'your-default-secret-key-for-development')
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+WHITENOISE_USE_FINDERS=True
 
-ALLOWED_HOSTS = []
+# Get environment 
+def _require_env(name):
+    """Raise an error if the environment variable isn't defined"""
+    value = os.getenv(name)
+    if value is None:
+        raise 'Required environment variable "{}" is not set.'.format(name)
+    return value
 
+def configure_allowed_hosts():
+    """
+    Configure the ALLOWED_HOSTS setting for a Django project.
+
+    Reads the 'DJANGO_ALLOWED_HOSTS' environment variable, splits it by commas,
+    and ensures '127.0.0.1' is included in the list of allowed hosts.
+
+    Returns:
+        list: A list of strings representing the allowed hosts for the Django application.
+    """
+    # Fetch the environment variable, with a default fallback if not set.
+    env_hosts = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,[::1]')
+    
+    # Split the string into a list, ensuring we remove any whitespace that might exist.
+    allowed_hosts = [host.strip() for host in env_hosts.split(',')]
+    
+    # Add '127.0.0.1' to the list if it's not already included to avoid duplicates.
+    if '127.0.0.1' not in allowed_hosts:
+        allowed_hosts.append('127.0.0.1')
+    
+    return allowed_hosts
+
+# Use the function to set ALLOWED_HOSTS
+ALLOWED_HOSTS = configure_allowed_hosts()
 
 # Application definition
 
@@ -38,14 +127,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'landing',
-    's3',
-    'ec2',
-    'rds',
+    'api',
+    'scheduler',
+    'credentials',
+    'logs',
+    'chatgpt',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -68,6 +161,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'awssheet.context_processors.get_regions',
+                'awssheet.context_processors.dynamic_form_yaml_data_processor',
+                
             ],
         },
     },
@@ -75,14 +170,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'awssheet.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+STEAMPIPE_DATABASE_PASSWORD=os.environ.get('STEAMPIPE_DATABASE_PASSWORD', 'default-secret-key')
+
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
+
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'steampipe',
+        'USER': 'steampipe',
+        'PASSWORD': STEAMPIPE_DATABASE_PASSWORD,
+        'HOST': '127.0.0.1',
+        'PORT': '9193',
     }
 }
 
@@ -105,6 +210,21 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# /tmp/cache dev/shm
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "iaws_cache_table",
+    }
+}
+
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+#         'LOCATION': 'CahceEntry',
+#     },
+# }
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -122,6 +242,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -165,3 +288,22 @@ LOGGING = {
         },
     },
 }
+
+# Set session to expire after 10 minutes of inactivity
+SESSION_COOKIE_AGE = 600  # 600 seconds = 10 minutes
+SESSION_SAVE_EVERY_REQUEST = True  # This resets the cookie timer on each request
+LOGIN_URL = '/'
+SECURE_HSTS_SECONDS = 3600  # This sets it for 1 hour; adjust as necessary
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Optional: Applies HSTS to all subdomains
+SECURE_HSTS_PRELOAD = True  # Optional: Allows preloading the site's HSTS settings into browsers
+
+# SECURE_SSL_REDIRECT = True
+
+DATA_UPLOAD_MAX_MEMORY_SIZE=10000
+
+# MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT='/tmp/media'
+MEDIA_URL = '/media/'
+# Documentation settings
+DOC_ROOT = os.path.join(BASE_DIR, 'docs/_build/html')
+DOC_URL = '/docs/'

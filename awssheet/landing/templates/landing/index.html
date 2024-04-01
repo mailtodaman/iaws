@@ -1,28 +1,57 @@
 {% extends 'landing/base.html' %}
 {% block content %}
-<div class="container">
-  <div class="row">
+<style>
+    .hover-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+.card-logo {
+    width: 100px; /* Fixed width */
+    height: 60px; /* Fixed height */
+    object-fit: contain; /* Ensures the image is scaled properly */
+    display: block;
+    margin: 0 auto;
+}
+
+
+</style>
+<div class="row mt-4">
     <div class="col">
-      <p class="fs-5">
-        In the current business landscape, an increasing number of enterprises are transitioning to cloud platforms, making the proficient management of AWS resources a pivotal aspect of web operations. AWS offers a plethora of services such as S3, EC2, and RDS that empower organizations to securely store data, host dynamic websites, and efficiently operate applications. Nonetheless, as an organization's infrastructure expands, it becomes imperative to have a tool that facilitates the seamless management of AWS resources.
-      </p>
-      <p class="fs-5">
-        A viable solution to this predicament is the integration of an HTML table to delineate AWS resources comprehensively. This approach not only simplifies data representation but also enhances user comprehension, enabling them to gauge the status of their resources promptly. Moreover, this format offers functionalities like sorting, filtering, and searching, which streamline the process of pinpointing issues and implementing rectifications.
-      </p>
-      <p class="fs-5">
-        This interactive HTML table is populated utilizing the AWS SDK, a versatile tool offering a gamut of APIs to access various AWS resources. For instance, one can showcase S3 buckets within the table by leveraging the SDK to obtain a detailed list of buckets along with pertinent metadata like creation dates and sizes. This method is equally effective for extracting information regarding EC2 instances, including their current status, specifications, and initiation date.
-      </p>
-      <p class="fs-5">
-        Following the data population within the HTML table, users are endowed with the capability to execute multiple simultaneous actions on their resources. This means they can select several resources and initiate batch operations, such as deletion or halting processes, enhancing efficiency, especially for entities managing a considerable number of resources.
-      </p>
-      <p class="fs-5">
-        Enhancing the operational efficiency further, the application can be configured to export the data from the HTML table into a CSV file format. This feature facilitates effortless data sharing amongst team members or for integration into analytical tools for in-depth analysis. Consequently, this versatility amplifies the operational efficacy and productivity, adapting to varied operational contexts.
-      </p>
-      <p class="fs-5">
-        In summary, the integration of an HTML table to delineate AWS resources can remarkably augment the efficiency and productivity of web operations. This user-friendly interface allows for swift issue identification and rectification, and the additional functionalities of batch operations and data exportation to CSV format further bolster efficiency and productivity. Hence, with the appropriate tools and strategies at their disposal, web companies of diverse scales can find the management of AWS resources to be a streamlined and manageable endeavor.
-      </p>
+        <!-- AWS Card -->
+        <div class="card hover-card mb-2">
+            <div class="card-body text-center">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg" alt="AWS Logo" class="card-logo mb-2">
+                <h5 class="card-title">Amazon Web Services</h5>
+                <p class="card-text">Access AWS resources and information.</p>
+                <a href="{% url 'landing:dashboard' %}?provider=aws" class="btn btn-primary">Go to AWS</a>
+               
+            </div>
+        </div>
     </div>
-  </div>
+    <div class="col">
+        <!-- Google Cloud Card -->
+        <div class="card hover-card mb-2">
+            <div class="card-body text-center">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Google_Cloud_logo.svg" alt="Google Cloud Logo" class="card-logo mb-2">
+                <h5 class="card-title">Google Cloud</h5>
+                <p class="card-text">Explore Google Cloud services and tools.</p>
+              
+                <a href="{% url 'landing:dashboard' %}?provider=gcp" class="btn btn-success">Go to Google Cloud</a>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <!-- Microsoft Azure Card -->
+        <div class="card hover-card mb-2">
+            <div class="card-body text-center">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/Microsoft_Azure_Logo.svg" alt="Azure Logo" class="card-logo mb-2">
+                <h5 class="card-title">Microsoft Azure</h5>
+                <p class="card-text">Discover Microsoft Azure capabilities.</p>
+                <a href="{% url 'landing:dashboard' %}?provider=azure" class="btn btn-info">Go to Azure Cloud</a>
+            </div>
+        </div>
+    </div>
 </div>
 
 

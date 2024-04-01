@@ -29,7 +29,7 @@ def f_createS3_bucket(request):
     aws_secret_access_key=request.session.get('aws_secret_access_key')
     AWS_REGION=settings.AWS_REGION_NAME
     bucketName = request.POST.get('bucketName')
-    print(type(bucketName))
+
     create_s3_bucket(bucketName,aws_access_key_id,aws_secret_access_key,AWS_REGION)
     messages.success(request, f'Successfully created bucket {bucketName}.')
     return redirect('index')
@@ -39,7 +39,7 @@ def f_removeS3_bucket(request):
     aws_secret_access_key=request.session.get('aws_secret_access_key')
     AWS_REGION=settings.AWS_REGION_NAME
     bucketName = request.POST.get('bucketName')
-    print(type(bucketName))
+   
     remove_s3_bucket(bucketName,aws_access_key_id,aws_secret_access_key)
     messages.success(request, f'Successfully removed bucket {bucketName}.')
     return redirect('index')

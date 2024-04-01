@@ -16,13 +16,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
-
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('',include(('landing.urls','landing') ,namespace='landing')),
     path('admin/', admin.site.urls),
-    path('s3/',include('s3.urls')),
-    path('ec2/',include('ec2.urls')),
-    path('rds/',include('rds.urls')),
-
+    path('api/', include('api.urls')),
+    path('scheduler/', include('scheduler.urls')),
+    path('credentials/', include('credentials.urls')),
+    path('chatgpt/', include('chatgpt.urls')),
+    path('logs/', include('logs.urls')),
+  
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.DOC_URL, document_root=settings.DOC_ROOT)

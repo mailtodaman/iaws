@@ -1,5 +1,11 @@
 import boto3
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError
+# context_processors.py
+import yaml,json
+from django.core.cache import cache
+from django.conf import settings
+
+dynamic_form_file = settings.DYNAMIC_FORM
 
 def get_regions(request):
     try:
@@ -32,5 +38,54 @@ def get_regions(request):
   
     return {'get_regions': regions}
 
+def dynamic_form_yaml_data_processor_yaml(request):
+    file_path = dynamic_form_file
+    cache_key = f"yaml_data_{file_path}"
+    cache_duration = 0  # cache duration in seconds
+
+    # Try to get data from cache
+    data = cache.get(cache_key)
+
+    # If not in cache, read the file and store in cache
+    if data is None:
+        try:
+            with open(file_path, 'r') as file:
+                # Load all documents from the YAML file
+                documents = yaml.safe_load_all(file)
+                # Convert the generator to a list
+                data = list(documents)
+            cache.set(cache_key, data, cache_duration)
+        except FileNotFoundError:
+            data = []
+
+    return {
+        'yaml_data': data
+    }
 
 
+def dynamic_form_yaml_data_processor(request):
+    file_path = dynamic_form_file
+    cache_key = f"yaml_data_{file_path}"
+    cache_duration = 0  # cache duration in seconds
+
+    # Try to get data from cache
+    data = cache.get(cache_key)
+
+    # If not in cache, read the file and store in cache
+    if data is None:
+        try:
+            with open(file_path, 'r') as file:
+                # Load all documents from the YAML file
+                documents = yaml.safe_load_all(file)
+                # Convert the generator to a list
+                data = list(documents)
+            # Convert data to JSON string for JavaScript compatibility
+            data_json = json.dumps(data)
+            cache.set(cache_key, data_json, cache_duration)
+        except FileNotFoundError:
+            data_json = '[]'
+
+    return {
+        'dynamic_form': data_json  # Return JSON string
+    }
+ 

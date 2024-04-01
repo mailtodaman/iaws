@@ -1,110 +1,66 @@
+{% load static %}
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<!--  -->
+ 
+      <!-- Scripts -->
+    <script src="https://cdn.plot.ly/plotly-basic-latest.min.js"></script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+    <script src="{% static 'landing/third_party/jquery/jquery.min.js' %}"></script> 
+    <script src="{% static 'landing/js/script.js' %}"></script> 
+   
+    <script src="{% static 'landing/third_party/bootstrap/js/bootstrap.bundle.min.js' %}"></script> 
+    <link rel="stylesheet" href="{% static 'landing/third_party/bootstrap/css/bootstrap.min.css' %}" type="text/css">
+
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+   
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.14/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+
+
+         
+    <link rel="stylesheet" href="{% static 'landing/third_party/jquery-ui/jquery-ui.css' %}" type="text/css">
+    <script src="{% static 'landing/third_party/jquery-ui/jquery-ui.min.js' %}"></script>   
+
+
+
+
+
+    
+    <script src="{% static 'landing/js/customtable.js' %}"></script> 
+    <!-- Include PivotTable.js -->
+   
+
+    <script src="{% static 'landing/third_party/plotly/pivot.min.js' %}"></script> 
+    <script src="{% static 'landing/third_party/plotly/plotly_renderers.js' %}"></script> 
+    <link rel="stylesheet" href="{% static 'landing/third_party/plotly/pivot.min.css' %}" type="text/css">
     
   
+
+    <link rel="stylesheet" href="{% static 'landing/css/style.css' %}" type="text/css">
+    <script src="{% static 'landing/js/script.js' %}"></script>
+    <script src="{% static 'landing/js/chart4.4.1.js' %}" defer ></script>
+   <!-- This is required for reports jsco, csv,xml,etc -->
+  <!-- <script>
+        var myJsonData = {{data|safe}};
+  </script> -->
     
-    <!-- Additional Styles -->
-    <style>
-      .hot-container {
-        width: 100%;
-      }
-      .navbar-nav a:hover {
-        color: #fff;
-        background-color: #007bff;
-        border-radius: 5px;
-      }
-      .logout-button {
-        border: none;
-        background-color: #f8f9fa;
-        cursor: pointer;
-      }
-      .logout-button:hover {
-        color: #007bff;
-      }
-    </style>
 
-<!--Style for Zone selection-->
-<style>
-  body {
-      font-family: 'Arial, sans-serif';
-      background-color: #f8f9fa;
-      color: #343a40;
-  }
-  .container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin: 20px;
-    }
 
-    .multi-select-container {
-        position: relative;
-        width: 300px;
-        border: 1px solid #ced4da;
-        border-radius: 4px;
-        background-color: #ffffff;
-        color: #495057;
-        padding: 10px;
-        margin-bottom: 20px;
-    }
-
-    .multi-select-container ul {
-        list-style-type: none;
-        padding: 0;
-        margin: 0;
-        max-height: 200px;
-        overflow-y: scroll;
-        display: none;
-        position: absolute;
-        top: 45px;
-        width: 100%;
-        border: 1px solid #ced4da;
-        background: #fff;
-        z-index: 1000;
-    }
-
-    .multi-select-container ul li {
-        padding: 10px;
-        cursor: pointer;
-    }
-
-    .multi-select-container ul li:hover {
-        background-color: #f1f1f1;
-    }
-
-    .multi-select-container ul li.selected {
-        background-color: #e9ecef;
-    }
-
-    .multi-select-container > div {
-        cursor: pointer;
-    }
-
-    .btn-group {
-        display: flex;
-        align-items: center;
-    }
-
-    .btn-group .form-group {
-        margin-right: 20px;
-    }
-</style>
 
     <title>{{ heading }}</title>
   </head>
   <body>
     <header>
-      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <nav class="navbar navbar-expand-lg  bg-primary" >
         <div class="container-fluid">
           <a class="navbar-brand" href="/">iAWS</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -113,22 +69,145 @@
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#">Home</a>
+                <a class="nav-link active" aria-current="page" href="/index/">Home</a>
               </li>
               <!-- Add links to other pages here -->
-              <li class="nav-item">
-                <a class="nav-link" href="/s3">S3</a>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="awsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  AWS
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="awsDropdown">
+                  <li><a class="dropdown-item" href="{% url 'landing:dashboard'%}?provider=aws" id="dashboardLink">Dashboard</a></li>
+                  <li><a class="dropdown-item" href="{% url 'landing:platform_tables'%}?provider=aws&report_type=all_tables">Tables</a></li>
+                  <li><a class="dropdown-item" href="{% url 'landing:platform_tables'%}?provider=aws&report_type=compliance">Compliance</a></li>
+                  <li><a class="dropdown-item" href="{% url 'landing:platform_tables'%}?provider=aws&report_type=benchmark">Benchmarks</a></li>
+                 
+                </ul>
+              </li>
+          
+              
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="awsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  GCP
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="awsDropdown">
+                  <!-- AWS specific sub-links -->
+                  <li><a class="dropdown-item" href="{% url 'landing:dashboard'%}?provider=gcp" id="dashboardLink">Dashboard</a></li>
+                  <li><a class="dropdown-item" href="{% url 'landing:platform_tables'%}?provider=gcp&report_type=all_tables">Tables</a></li>
+                  <li><a class="dropdown-item" href="{% url 'landing:platform_tables'%}?provider=gcp&report_type=compliance">Compliance</a></li>
+                  <li><a class="dropdown-item" href="{% url 'landing:platform_tables'%}?provider=gcp&report_type=benchmark">Benchmarks</a></li>
+                  <!-- More AWS sub-items can be added here -->
+                </ul>
+              
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="awsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Azure
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="awsDropdown">
+                  <!-- AWS specific sub-links -->
+                  <li><a class="dropdown-item" href="{% url 'landing:dashboard'%}?provider=azure" id="dashboardLink">Dashboard</a></li>
+                  <li><a class="dropdown-item" href="{% url 'landing:platform_tables'%}?provider=azure&report_type=all_tables">Tables</a></li>
+                  <li><a class="dropdown-item" href="{% url 'landing:platform_tables'%}?provider=azure&report_type=compliance">Compliance</a></li>
+                  <li><a class="dropdown-item" href="{% url 'landing:platform_tables'%}?provider=azure&report_type=benchmark">Benchmarks</a></li>
+                  <!-- More AWS sub-items can be added here -->
+                </ul>
+
+              </li>
+
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="awsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  K8S
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="awsDropdown">
+                  <!-- AWS specific sub-links -->
+                  <li><a class="dropdown-item" href="{% url 'landing:dashboard'%}?provider=kubernetes" id="dashboardLink">Dashboard</a></li>
+                  <li><a class="dropdown-item" href="{% url 'landing:platform_tables'%}?provider=kubernetes&report_type=all_tables">Tables</a></li>
+                 
+                  <!-- More AWS sub-items can be added here -->
+                </ul>
+
+              </li>
+
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="awsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Multi Cloud</a>
+                <ul class="dropdown-menu" aria-labelledby="awsDropdown">
+                  <!-- AWS specific sub-links -->
+                  <li><a class="dropdown-item" href="{% url 'landing:platform_tables'%}?provider=all&report_type=all_tables">All Tables</a></li>
+                  <li><a class="dropdown-item" href="{% url 'landing:search'%}">Search Everywhere</a></li>
+                  <!-- More AWS sub-items can be added here -->
+                </ul>
+              </li>
+              
+
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="/admin" id="awsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Admin</a>
+                <ul class="dropdown-menu" aria-labelledby="awsDropdown">
+                  <!-- AWS specific sub-links -->
+                  <li><a class="dropdown-item" href="{% url 'landing:yaml_handler' %}?file_name=context_menu">Context Menu</a></li>
+                  <li><a class="dropdown-item" href="{% url 'landing:yaml_handler' %}?file_name=config_file">Update Config</a></li>
+                  <li><a class="dropdown-item" href="{% url 'landing:yaml_handler' %}?file_name=dashboard_file">Update Dashboard</a></li>
+                  <li><a class="dropdown-item" href="/scheduler/">Schedule Tasks</a></li>
+                  <li><a class="dropdown-item" href="/credentials/">Keys</a></li>
+                
+                 
+                  <!-- More AWS sub-items can be added here -->
+                </ul>
+              </li>
+             
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="" id="awsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Logs
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="awsDropdown">
+                  <!-- AWS specific sub-links -->
+          
+                  <li><a class="dropdown-item" href="/logs/?log_name=chatgpt">ChatGPT</a></li>
+                  <li><a class="dropdown-item" href="/logs/?log_name=terminal">Terminal</a></li>
+                  <li><a class="dropdown-item" href="/logs/?log_name=scheduler">Scheduler</a></li>
+                  <li><a class="dropdown-item" href="/logs/?log_name=context">Context</a></li>
+                  <li><a class="dropdown-item" href="/logs/?log_name=query">Query</a></li>
+                  <li><a class="dropdown-item" href="/logs/?log_name=all">All Logs</a></li>
+                 
+                  <!-- More AWS sub-items can be added here -->
+                </ul>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/ec2">EC2</a>
+                <a class="nav-link" href="/docs/index.html" target="_blank">Help</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/rds">RDS</a>
-              </li>
+              <ul class="navbar-nav d-flex flex-row" id="cloudServicesNav">
+                <li class="nav-item mx-2 text-center">
+                    <span class="d-block cloud-service aws-color">AWS</span>
+                    <div>
+                        <span class="status-ok">OK 8</span>
+                        <span class="status-alarm">Alarm 9</span>
+                        <span class="status-info">Info 2</span>
+                    </div>
+                </li>
+                <li class="nav-item mx-2 text-center">
+                    <span class="d-block cloud-service gcp-color">GCP</span>
+                    <div>
+                        <span class="status-ok">OK 8</span>
+                        <span class="status-alarm">Alarm 9</span>
+                        <span class="status-info">Info 2</span>
+                    </div>
+                </li>
+                <li class="nav-item mx-2 text-center">
+                    <span class="d-block cloud-service azure-color">Azure</span>
+                    <div>
+                        <span class="status-ok">OK 8</span>
+                        <span class="status-alarm">Alarm 9</span>
+                        <span class="status-info">Info 2</span>
+                    </div>
+                </li>
             </ul>
-            <div class="container">
+        </div>
+
+
+            </ul>
+  
          
-              <div class="multi-select-container" onclick="toggleDropdown()">
+              <!-- <div class="multi-select-container" onclick="toggleDropdown()">
               <div id="selectedZone">Select Regions</div>
               <ul id="zoneList">
 
@@ -136,18 +215,21 @@
                       <li data-value="{{ zone }}" onclick="toggleSelection(event, '{{ zone }}')">{{ zone }}</li>
                   {% endfor %}
               </ul>
+          </div>    
+        </div> -->
+       
+      
+          <div id="customQueryForm" class="input-group d-none" style="width: 25%">
+              <input type="text" id="queryInput" class="form-control form-control-sm" placeholder="Enter your query" aria-label="Recipient's username" aria-describedby="button-addon2">
+              <button class="btn btn-outline-secondary btn-sm" type="button" id="button-addon2">Run Query</button>
           </div>
-        </div>
-            <div class="btn-group" role="group" aria-label="Data Management">
-              <div class="form-group mr-5">
-                <input id="searchgrid" type="text" class="form-control input-lg" placeholder="Search..." />
-              </div>
-              <button id="refresh-button" class="btn btn-secondary" data-toggle="tooltip" title="Refresh"><i class="fas fa-sync-alt"></i></button>
-              <button id="import-file" class="btn btn-secondary" data-toggle="tooltip" title="Import"><i class="fas fa-file-import"></i></button>
-              <button id="export-file" class="btn btn-secondary" data-toggle="tooltip" title="Export"><i class="fas fa-file-export"></i></button> 
-            </div>
+      
 
-
+      
+          <span class="navbar-text ms-3">
+            {{ request.user.username }}
+           </span>
+        
             <form action="{% url 'landing:aws_logout' %}" method="post" class="d-inline">
               {% csrf_token %}
               <button type="submit" class="btn btn-outline-danger ms-3">Logout</button>
@@ -156,7 +238,8 @@
         </div>
       </nav>
     </header>
-
+ 
+  
     <main>
       {% block content %}{% endblock %}
     </main>
@@ -165,11 +248,14 @@
       <!-- Add your footer content here -->
     </footer>
 
-    <!-- Scripts -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 
+   
+  <script>
+
+
+  </script>
     <!-- Additional Scripts -->
     <script>
       function showSuccessMessage() {
@@ -178,31 +264,12 @@
           $('#success-message').hide();
         }, 5000);
       }
-
-      function postData(url, data, action) {
-        console.log("POST URL", url);
-        console.log("POST DATA", data);
-        return $.ajax({
-          url: url,
-          type: action,
-          data: data,
-          headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-          success: function (response) {
-            showSuccessMessage();
-            console.log("POST SUCCESS", response);
-            location.reload(); 
-          },
-          error: function (request, status, error) {
-            alert(request.responseText);
-          }
-        });
-      }
+    
+      
     </script>
-      <script>
-        $(document).ready(function(){
-          $('[data-toggle="tooltip"]').tooltip(); 
-        });
-      </script>
+
+    
+     
 
 <!-- zone selection-->
 <script>
@@ -232,31 +299,103 @@
 
 </script>
 
-<!--Export CSV-->
-<script>
-  var button1 = document.getElementById('export-file');
-  var exportPlugin1 = hot.getPlugin('exportFile');
 
-   button1.addEventListener('click', function() {
-    exportPlugin1.downloadFile('csv', {
-    bom: false,
-    columnDelimiter: ',',
-  //  columnHeaders: false,
-   // exportHiddenColumns: true,
-    exportHiddenRows: true,
-    fileExtension: 'csv',
-    filename: 'CSV-file_[YYYY]-[MM]-[DD]',
-    mimeType: 'text/csv',
-    rowDelimiter: '\r\n',
-    rowHeaders: true,
-    columnHeaders:true
-  });
-});
+<!-- Export to CSV -->
+<script>
+  function exportToCsv(data, filename = 'exported_data.csv') {
+    // Check if data is not an array
+    if (!Array.isArray(data) || !data.length) {
+        return;
+    }
+
+    // Extract column headers
+    const headers = Object.keys(data[0]);
+    let csvContent = headers.join(',') + '\n';
+
+    // Iterate over the rows
+    for (let row of data) {
+        let csvRow = headers.map(header => {
+            let cell = row[header];
+
+            // Convert nested objects/arrays to JSON strings
+            if (cell && typeof cell === 'object') {
+                cell = JSON.stringify(cell);
+            }
+
+            cell = cell === null || cell === undefined ? '' : cell.toString();
+            return `"${cell.replace(/"/g, '""')}"`;  // Handle cells with commas or quotes
+        }).join(',');
+        csvContent += csvRow + '\n';
+    }
+
+    // Download the CSV file
+    download(filename, csvContent);
+}
+
+function download(filename, text) {
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+}
+
+</script>
+
+<!-- Export YAML -->
+
+<script>
+function exportJsonToYaml(data) {
+    try {
+        // Check if data is valid
+        if (typeof data !== 'object' || data === null) {
+            alert("Invalid data for YAML conversion.");
+            return;
+        }
+
+        // Convert the object to YAML
+        var yamlData = jsyaml.dump(data, {
+            // Add any specific options for YAML formatting here
+            indent: 4  // Example: Set indentation level
+        });
+
+        // Download the YAML file
+        download("exported_data.yaml", yamlData);
+    } catch (e) {
+        console.error("Error converting JSON to YAML:", e);
+        alert("An error occurred while converting JSON to YAML.");
+    }
+}
+
+
+function download(filename, text) {
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+}
+
+</script>
+
+<!-- Export JSON -->
+<script>
+
 </script>
 
 
-<!-- Search block-->
-<script>
+<!-- Search block in the table itself -->
+<!-- <script>
 document.getElementById('searchgrid').addEventListener('keyup', function() {
   var query = this.value.toLowerCase();
   var filteredData = data.filter(function(row) {
@@ -266,7 +405,123 @@ document.getElementById('searchgrid').addEventListener('keyup', function() {
   });
   hot.loadData(filteredData);
 });
-</script>
+</script> -->
 
   </body>
 </html>
+
+<!-- Save to doc -->
+<script>
+  
+</script>
+
+
+
+
+<div class="modal fade" id="terminalModal" tabindex="-1" role="dialog" aria-labelledby="terminalModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="terminalModalLabel">Terminal</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="background-color: black; color: white;">
+        <div id="output" style="white-space: pre-wrap; max-height: 400px; overflow-y: auto;"></div>
+        <input type="text" id="commandInputModal" class="form-control mt-3" placeholder="Enter command">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button id="executeCommandModal" class="btn btn-primary">Execute</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('executeCommandModal').addEventListener('click', function() {
+      var command = document.getElementById('commandInputModal').value;
+      fetch('/execute-command/', {
+          method: 'POST',
+          headers: {
+              'X-CSRFToken': getCookie('csrftoken'), // Ensure CSRF token is correctly included
+              'Content-Type': 'application/json'    // Set the content type to 'application/json'
+          },
+          body: JSON.stringify({ 'command': command }) // Convert the data to a JSON string
+      })
+      .then(response => response.json())
+      .then(data => {
+          var outputDiv = document.getElementById('output');
+          // Prepend the new command and its output to the top
+          outputDiv.innerHTML = '<span class="text-primary">$ ' + command + '</span>\n' + data.output + '\n\n' + outputDiv.innerHTML;
+      });
+      document.getElementById('commandInputModal').value = ''; // Clear the input field
+  });
+  
+  // Function to get CSRF token
+  function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+  </script>
+  
+
+
+
+  
+
+
+
+<!--Custom query -->
+<script>  
+      $(document).ready(function() {
+        $('#button-addon2').on('click', function(event) {
+            var userQuery = $('#queryInput').val();
+
+            // Prepare the data to be sent
+            var dataToSend = {
+                'query': userQuery,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'  // Include the CSRF token
+            };
+
+            // Call your existing postData function
+            postData('{% url 'landing:custom_query_view'%}', dataToSend, 'POST');
+        });
+    });
+</script>
+<script>
+    $(document).ready(function(){
+      $('[data-toggle="tooltip"]').tooltip(); 
+    });
+</script>
+
+<style>
+  /* UserName */
+  .navbar-text {
+    font-size: 16px; /* Adjusts the font size */
+    color: #ffffff; /* Changes the text color */
+    font-weight: bold; /* Makes the font bold */
+    margin-right: 15px; /* Adds some spacing to the right */
+    text-transform: capitalize; /* Capitalizes the text for a more formal appearance */
+}
+
+/* Optional: Adjust the hover effect */
+.navbar-text:hover {
+    color: #dddddd; /* Lightens the color on hover for a subtle effect */
+    text-decoration: none; /* Removes underline on hover */
+    cursor: default; /* Keeps the cursor default since it's not a link */
+}
+</style>
+  
+
