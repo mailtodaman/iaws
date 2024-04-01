@@ -1,3 +1,16 @@
-django
+Django==4.2.8
 awscli
 boto3 
+psycopg2-binary
+djangorestframework==3.14.0
+openai==0.28
+c7n
+c7n_azure
+c7n_gcp
+c7n_oci
+azure-identity  
+google-auth
+google-cloud-storage
+sphinx
+sphinx-rtd-themgunicorn
+whitenoise
