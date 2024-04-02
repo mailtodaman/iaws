@@ -1,7 +1,0 @@
-policies:
-  - name: s3-set-bucket-encryption
-    resource: s3
-    actions:
-      - type: set-bucket-encryption
-        crypto: AES256
-        enabled: True
