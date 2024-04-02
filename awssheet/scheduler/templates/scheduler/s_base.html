@@ -1,0 +1,35 @@
+{% extends "landing/base.html" %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iAWS Task Scheduler</title>
+    <!-- Example: Link to a CSS file for styling -->
+  
+    <link rel="stylesheet" href="{% static 'scheduler/css/scheduler_styles.css' %}" type="text/css">
+
+
+</head>
+<body>
+    <header>
+    
+        <nav>
+            <ul>
+                <li><a href="{% url 'list_tasks' %}">Home</a></li>
+                <li><a href="{% url 'add_task' %}">Add New Task</a></li>
+                <!-- Add more navigation links as needed -->
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        <!-- This block will be filled with child template content -->
+        {% endblock %}
+    </main>
+
+
+</body>
+</html>

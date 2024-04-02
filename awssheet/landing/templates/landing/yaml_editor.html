@@ -1,0 +1,39 @@
+<!-- FILEPATH: /Users/damanjeetsingh/Documents/github/iaws/awssheet/landing/templates/landing/yaml_editor.html -->
+{% extends 'landing/base.html' %}
+
+{% block content %}
+
+    
+    <title>Edit YAML File</title>
+    <style>
+        textarea {
+            width: 100%;
+            height: 500px;
+        }
+        .message {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+    <body>
+        <h2>Editing file {{file_path}}</h2>
+    
+        <!-- Display message -->
+        {% if message %}
+        <div class="message">{{ message }}</div>
+        {% endif %}
+    
+        <!-- YAML content form -->
+        <form method="post">
+            {% csrf_token %}
+    
+            <!-- Display YAML content in a textarea, make it readonly if file is locked -->
+            <textarea name="content" {% if readonly %}readonly{% endif %}>{{ content }}</textarea><br>
+    
+            <!-- Submit button is disabled if file is in read-only mode -->
+            {% if not readonly %}
+            <input type="submit" value="Save Changes">
+            {% endif %}
+        </form>
+    </body>
+{% endblock %}

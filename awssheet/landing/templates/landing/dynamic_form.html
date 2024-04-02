@@ -1,0 +1,288 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Dynamic Form</title>
+    <script src="{% static 'landing/third_party/bootstrap/js/bootstrap.bundle.min.js' %}"></script> 
+    <link rel="stylesheet" href="{% static 'landing/third_party/bootstrap/css/bootstrap.min.css' %}" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+
+   
+    <!-- jQuery UI CSS -->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- jQuery UI -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</head>
+
+<style>
+    #data {
+    background-color: #585555;; /* Dark background */
+    color: #fff;          /* Light text color */
+    font-family: 'Courier New', Courier, monospace; /* Monospace font */
+    padding: 10px;
+    border: 1px solid #ccc; /* Light gray border */
+    overflow-y: auto;       /* Scrollbar for overflow */
+    max-height: 400px;      /* Maximum height with scrollbar */
+    white-space: pre-wrap;  /* Preserves formatting and line breaks */
+}
+
+</style>
+<body>
+
+    <div class="container">
+        <!-- Hidden div to store row data -->
+        <div id="row-data" style="display: none;">{{ row_data | safe }}</div>
+
+        <!-- Table container -->
+        <div id="table-container"></div>
+
+        <!-- Form -->
+        <form method="post" class="form-horizontal" id="iawsform">
+            <h1>{{ form.form_heading }}</h1>
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group row">
+                <label for="{{ field.id_for_label }}" class="col-sm-2 col-form-label">
+                    {{ field.label }}
+                    {% if field.field.required %}
+                    <span class="text-danger">*</span>
+                    {% endif %}
+                </label>
+                <div class="col-sm-10">
+                    {{ field }}
+                    {% if field.help_text %}
+                    <small class="text-muted">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+            <div class="form-group row">
+                <div class="col-sm-10 offset-sm-2">
+                    <button type="submit" class="btn btn-primary" id="submitButton">Submit</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Command Output -->
+        <div id="command-output-section" class="mt-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h2 class="mb-0">Command Output:</h2>
+                <a href="#" onclick="downloadDataAsTextFile()" class="btn btn-outline-secondary">
+                    <!-- <i class="bi bi-download"></i> Bootstrap icon for download -->
+                    <i class="fa-solid fa-download"></i>
+                </a>
+            </div>
+            <div id="progress" class="progress" style="width: 100%;">
+                <div class="progress-bar" role="progressbar"></div>
+            </div>
+            <div id="data" class="border p-3" style="height: 300px; overflow-y: auto; white-space: pre-wrap;"></div>
+        </div>
+            </div>
+
+    
+
+    <script>
+        function downloadDataAsTextFile() {
+            var data = document.getElementById('data').innerText;
+            var blob = new Blob([data], { type: 'text/plain' });
+            var link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = 'data.txt';
+            document.body.appendChild(link); // Append to body to ensure visibility in all browsers
+            link.click();
+            document.body.removeChild(link); // Remove the link after triggering download
+        }
+    </script>
+    <!-- JavaScript at the end of the body -->
+    <script>
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        function createTableFromJson(jsonData) {
+            var table = document.createElement('table');
+            table.classList.add('table', 'table-bordered', 'table-striped'); // Bootstrap classes
+
+            // Create table header dynamically
+            var thead = table.createTHead();
+            var row = thead.insertRow();
+
+            if (jsonData.length > 0) {
+                var headers = Object.keys(jsonData[0]).map(function (key) {
+                    return key.split('_').map(capitalizeFirstLetter).join(' ');
+                });
+
+                headers.forEach(function (header) {
+                    var th = document.createElement('th');
+                    th.appendChild(document.createTextNode(header));
+                    row.appendChild(th);
+                });
+            }
+
+            // Create table body
+            var tbody = document.createElement('tbody');
+            table.appendChild(tbody);
+
+            jsonData.forEach(function (item) {
+                var tr = document.createElement('tr');
+                tbody.appendChild(tr);
+
+                Object.values(item).forEach(function (value) {
+                    var td = document.createElement('td');
+                    td.appendChild(document.createTextNode(value));
+                    tr.appendChild(td);
+                });
+            });
+
+            return table;
+        }
+    </script>
+    <script>
+        var rowData = JSON.parse(document.getElementById('row-data').textContent);
+        var tableContainer = document.getElementById('table-container');
+        var table = createTableFromJson(rowData);
+        tableContainer.appendChild(table);
+</script>
+<script>
+        // Function to update command output
+        function updateCommandOutput(output) {
+            console.log("updateCommandOutput", updateCommandOutput)
+            var commandOutputElement = document.getElementById('command-output');
+            commandOutputElement.textContent += output;
+        }
+
+        $('#iawsform').submit(function (event) {
+            event.preventDefault();
+            var formData = $(this).serialize();
+            var uniqueKey = '{{ unique_key }}';
+            var processUrl = '/dynamic_form_process/?unique_key=' + uniqueKey;
+            startStreaming(processUrl);
+            $.ajax({
+                url: processUrl,
+                type: 'POST',
+                data: formData,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    $('#submitButton').prop('disabled', true).text('Submitting...');
+                },
+                success: function (response) {
+                    if (response.status === 'error') {
+                        // Handle error case
+                        console.error('Error:', response.message);
+
+                        // You can display the error message to the user if needed
+                        alert('Error: ' + response.message);
+                    } else {
+                        // Handle the response as a success
+                        // startStreaming(); // Start streaming response
+                        // startPolling();
+                        
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    // Handle network or server errors
+                    console.error('Network Error:', textStatus, errorThrown);
+
+                    // Display an error message to the user if needed
+                    alert('Network Error: ' + textStatus);
+                },
+                complete: function () {
+                    // Enable the submit button again regardless of success or error
+                    $('#submitButton').prop('disabled', false).text('Submit');
+                }
+            });
+            
+        });
+        // Function to start streaming response
+        function startStreaming(url) {
+        let xmlhttp = new XMLHttpRequest();
+
+        xmlhttp.addEventListener('load', reqListener);
+        xmlhttp.addEventListener('progress', updateProgress, false);
+        xmlhttp.open("get", url, true);
+        xmlhttp.send();
+    }
+        // // Function to start polling for updates
+        // function startPolling() {
+        //     var uniqueKey = '{{ unique_key }}';
+        //     var pollurl = '/dynamic_form_poll/?unique_key=' + uniqueKey;
+
+        //     var pollingInterval = setInterval(function() {
+        //         $.ajax({
+        //             url: pollurl,
+        //             type: 'POST',
+        //             beforeSend: function(xhr, settings) {
+        //                 xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+        //             },
+        //             success: function(response) {
+        //                 updateCommandOutput(response.command_output);
+        //                 if (response.command_finished === true) {
+        //                     clearInterval(pollingInterval); // Stop polling
+        //                     $('#submitButton').prop('disabled', false).text('Submit');
+        //                 }
+        //             },
+        //             error: function() {
+        //                 clearInterval(pollingInterval);
+        //                 $('#submitButton').prop('disabled', false).text('Submit');
+        //             }
+        //         });
+        //     }, 1000);  // Poll every second
+        // }
+    </script>
+
+    <script>
+        let xmlhttp = new XMLHttpRequest();
+        function log(msg) {
+            console.log(msg);
+        }
+        function reqListener() {
+            log('our js register');
+        }
+
+        function updateProgress(oEvent) {
+            log('inside progress');
+            log(oEvent);
+            log(oEvent.currentTarget.responseText.length);
+            if (oEvent.lengthComputable) {
+                let percentComplete = (oEvent.loaded / oEvent.total) * 100;
+                document.getElementById('progress').innerText = percentComplete + ' %';
+            } else {
+                // Unable to compute progress information since the total size is unknown
+            }
+            document.getElementById('data').innerText = 'starting...\n' + oEvent.target.responseText;
+        }
+
+        // var uniqueKey = '{{ unique_key }}';
+        // var processUrl = '/dynamic_form_process/?unique_key=' + uniqueKey;
+        // url = processUrl;
+
+        // xmlhttp.addEventListener('load', reqListener);
+        // xmlhttp.addEventListener('progress', updateProgress, false);
+        // xmlhttp.open("get", url, true);
+        // xmlhttp.send();
+    </script>
+
+</body>
+
+</html>
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+
+<body>
+
+</body>
+
+</html>

@@ -1,0 +1,148 @@
+
+
+<!-- terminal.html -->
+
+<style>
+    #terminal {
+        background-color: #1c1c1c; /* Dark background */
+        color: #f8f8f8; /* Light text color */
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+       
+    }
+
+    #commandInput {
+        background-color: #333; 
+        color: #fff;
+        border: 1px solid #666;
+        height: 25px;
+        padding-inline: 1px;
+        padding-block: 1px;
+       
+    }
+
+    #output {
+        white-space: pre-wrap;
+        max-height: 550px;
+        overflow-y: auto;
+        background-color: #111;
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid #444;
+      
+    }
+
+    .command-line {
+        color: #4caf50; /* Green color for command text */
+    }
+
+    #executeCommand {
+        background-color: #333; /* Dark background for the button */
+        color: white; /* White text color */
+        border-color: #666; /* Dark border color */
+        height: 25px;
+        line-height: 1px;
+        margin-left: 5px;
+        font-size: 15px;
+       
+    }
+
+    #executeCommand:focus {
+        background-color: #4caf50; /* Change background color on focus */
+        color: black; /* Change text color on focus */
+        outline: none; /* Remove default focus outline */
+        box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.5); /* Custom focus shadow */
+    }
+
+    #executeCommand:hover {
+        background-color: #4caf50; /* Lighter green on hover */
+        color: #000; /* Black text color for better contrast */
+    /* Keep the existing focus outline and box-shadow for accessibility */
+    }
+    .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: #333;
+        color: white;
+        text-align: left;
+        height: 30%;
+        transition: transform 0.3s ease; /* Animate the transform property */
+        transform: translateY(100%); /* Initially hide the footer */
+    }
+    .footer.active {
+        transform: translateY(0%); /* Slide in */
+    }   
+</style>
+
+<footer class="footer">
+
+    <div class="container-fluid mt-3">
+        <div class="row">
+            <div class="col-12">
+                <div id="terminal">
+                    <!-- Command Input at the Top -->
+                    <div class="input-group mb-3">
+                        <input type="text" id="commandInput" class="form-control" placeholder="Enter command" required>
+                      
+                        <div class="input-group-append">
+                            <button id="executeCommand" class="btn btn-outline-light" type="button">Execute</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Output Div -->
+                    <div id="output"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+<script>
+document.getElementById('executeCommand').addEventListener('click', function() {
+    var command = document.getElementById('commandInput').value;
+    fetch('/execute-command/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'), // Ensure CSRF token is correctly included
+            'Content-Type': 'application/json'    // Set the content type to 'application/json'
+        },
+        body: JSON.stringify({ 'command': command }) // Convert the data to a JSON string
+    })
+    .then(response => response.json())
+    .then(data => {
+        var outputDiv = document.getElementById('output');
+        // Prepend the new command and its output to the top
+        outputDiv.innerHTML = '<span class="text-primary">$ ' + command + '</span>\n' + data.output  + outputDiv.innerHTML;
+    });
+    document.getElementById('commandInput').value = ''; // Clear the input field
+});
+
+// Function to get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+
+
+</script>
+
+
+
+
+
+

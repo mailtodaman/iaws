@@ -1,0 +1,38 @@
+/* custom_theme.css */
+
+/* General body background */
+body {
+    background-color: #f0faff;
+}
+
+/* Header background */
+.wy-header {
+    background-color: #add8e6;
+}
+
+/* Sidebar background */
+.wy-nav-side {
+    background-color: #b9e0f7;
+}
+
+/* Sidebar heading color */
+.wy-menu-vertical header {
+    color: #ffffff;
+}
+
+/* Link colors */
+a {
+    color: #007bff;
+}
+
+/* Navbar links */
+.wy-nav-top a {
+    color: #ffffff;
+}
+
+/* Active sidebar link */
+.wy-menu-vertical li.current a {
+    background-color: #92c9f0;
+    color: #ffffff;
+}
+

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+/* Reset default margin and padding */
+body {
+        margin: 0;
+        padding: 0;
+        background: #f0f0f0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-family: 'Arial', sans-serif;
+    }
+
+    /* Container for the login form */
+    .login-container {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        text-align: center;
+    }
+
+    /* Heading style for the login form */
+    .login-container h1 {
+        margin-bottom: 20px;
+        font-size: 24px;
+        color: #333;
+    }
+
+    /* Style for form groups (labels and inputs) */
+    .form-group {
+        margin-bottom: 15px;
+        text-align: left;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    /* Style for the login button */
+    button {
+        width: 100%;
+        padding: 10px;
+        background: #2852a7;
+        border: none;
+        border-radius: 5px;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer; /* Add cursor pointer on hover */
+    }
+
+    button:hover {
+        background: #214187;
+    }
+
+    /* Additional information or links */
+    p {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #666;
+    }
+
+    p a {
+        color: #28a745;
+        text-decoration: none;
+    }
+
+    p a:hover {
+        text-decoration: underline;
+    }
+
+</style>
+<title>Login Page</title>
+</head>
+<body>
+<div class="login-container">
+    <h1>Login to Account</h1>
+    {% block content %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+    {% endblock %}
+   
+</div>
+</body>
+</html>
