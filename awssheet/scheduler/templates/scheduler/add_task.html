@@ -5,6 +5,7 @@
 {% block content %}
 {% load static %}
 <link rel="stylesheet" href="{% static 'scheduler/css/scheduler_styles.css' %}" type="text/css">
+<link rel="stylesheet" href="{% static 'landing/css/style.css' %}" type="text/css">
 <div class="schedule">
 
 
@@ -20,7 +21,7 @@
    
 
 
-<div class="form-container">
+<div class="form-container" style="font-family: Arial, sans-serif;">
     <h2>Add New Task</h2>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}

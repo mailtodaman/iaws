@@ -1,8 +1,9 @@
 {% extends 'scheduler/s_base.html' %}
-
 {% block content %}
 {% load static %}
 <link rel="stylesheet" href="{% static 'scheduler/css/scheduler_styles.css' %}" type="text/css">
+<link rel="stylesheet" href="{% static 'landing/css/style.css' %}" type="text/css">
+
 <div class="schedule">
 <header>
     <nav >
@@ -14,7 +15,8 @@
     </nav>
 </header>
 </div>
-<h2>Job List</h2>
+<div style="font-family: Arial, sans-serif;">
+    <h2>Job List</h2>
 <table>
     <thead>
         <tr>
@@ -46,4 +48,6 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
+
 {% endblock %}
