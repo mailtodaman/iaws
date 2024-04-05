@@ -7,6 +7,23 @@ from django.views.decorators.http import require_POST
 from .models import ScheduledTask
 from django.contrib.auth.decorators import login_required
 
+import schedule
+import time
+import subprocess
+
+def schedule_task(cmd):
+    tasks = ScheduledTask.objects.all()
+    print(f'========> {cmd} ======')
+    # for task in tasks:
+    #     # Execute the command specified in the ScheduledTask object
+    #     # subprocess.run(task.command, shell=True)
+    #     print(f'========> {cmd} ======')
+
+def run_scheduler():
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
 @login_required
 def add_task(request):
     """
@@ -15,7 +32,9 @@ def add_task(request):
     if request.method == 'POST':
         form = ScheduledTaskForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            command = form.cleaned_data['command']
+            # form.save()
+            schedule.every(3).seconds.do(schedule_task,command)
             return redirect('list_tasks')
     else:
         form = ScheduledTaskForm()
@@ -64,3 +83,7 @@ def delete_task_result(request, result_id):
     task_id = result.task.id  # Capture the associated task's id to redirect back to it
     result.delete()
     return redirect('task_detail', task_id=task_id)
+
+# Start the scheduler in a separate thread
+import threading
+threading.Thread(target=run_scheduler).start()
