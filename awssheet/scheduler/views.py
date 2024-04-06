@@ -11,13 +11,33 @@ import schedule
 import time
 import subprocess
 
-def schedule_task(cmd):
-    tasks = ScheduledTask.objects.all()
-    print(f'========> {cmd} ======')
-    # for task in tasks:
-    #     # Execute the command specified in the ScheduledTask object
-    #     # subprocess.run(task.command, shell=True)
-    #     print(f'========> {cmd} ======')
+def schedule_task(cron_expr, job_func):
+    # Parse the cron expression
+    cron_fields = list(map(int, cron_expr.split()))
+    print('=========>', cron_fields)
+
+    # Convert the cron expression to schedule format
+    minute = cron_fields[0]
+    hour = cron_fields[1]
+    day_of_month = cron_fields[2]
+    month = cron_fields[3]
+    day_of_week = cron_fields[4]
+
+    # Schedule the task
+    schedule.every(minute).seconds.do(job_func)
+    # schedule.every(hour).hours.do(job_func)
+    # schedule.every(day_of_month).days.do(job_func)
+    # schedule.every(month).months.do(job_func)
+    # schedule.every(day_of_week).day.of_week.do(job_func)
+
+
+# def schedule_task(cmd):
+#     tasks = ScheduledTask.objects.all()
+#     print(f'========> {cmd} ======')
+#     # for task in tasks:
+#     #     # Execute the command specified in the ScheduledTask object
+#     #     # subprocess.run(task.command, shell=True)
+#     #     print(f'========> {cmd} ======')
 
 def run_scheduler():
     while True:
@@ -33,8 +53,11 @@ def add_task(request):
         form = ScheduledTaskForm(request.POST, request.FILES)
         if form.is_valid():
             command = form.cleaned_data['command']
+            cron_expr = form.cleaned_data['schedule']
+            job_func = lambda: print(f"=========> {command}")
             # form.save()
-            schedule.every(3).seconds.do(schedule_task,command)
+            # schedule.every(3).seconds.do(schedule_task,command)
+            schedule_task(cron_expr, job_func)
             return redirect('list_tasks')
     else:
         form = ScheduledTaskForm()
