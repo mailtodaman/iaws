@@ -5,6 +5,8 @@ from .models import ScheduledTask
 from django.core.exceptions import ValidationError
 
 class ScheduledTaskForm(forms.ModelForm):
+    schedule = forms.CharField(label='Schedule', 
+                    widget=forms.TextInput(attrs={'placeholder': 'Minutes'}))
     class Meta:
         model = ScheduledTask
         fields = ['name', 'command', 'schedule', 'script', 'shell']

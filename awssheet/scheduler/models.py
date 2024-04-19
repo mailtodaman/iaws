@@ -11,6 +11,7 @@ class ScheduledTask(models.Model):
     schedule = models.CharField(max_length=100)
     script = models.FileField(upload_to='scripts/', blank=True)  # Allow blank
     shell = models.CharField(max_length=50, choices=(('bash', 'Bash'), ('tcsh', 'Tcsh')), blank=True)  # Allow blank for shell as well
+    # skip script and shell 
 
     def __str__(self):
         return self.name

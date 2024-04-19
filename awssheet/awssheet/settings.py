@@ -134,8 +134,10 @@ INSTALLED_APPS = [
     'credentials',
     'logs',
     'chatgpt',
+
     # library 
     'schedule',
+    'croniter',
 ]
 
 MIDDLEWARE = [
