@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.db import models
 
 class ScheduledTask(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     command = models.TextField(blank=True)  # Allow blank
     schedule = models.CharField(max_length=100)
     script = models.FileField(upload_to='scripts/', blank=True)  # Allow blank
