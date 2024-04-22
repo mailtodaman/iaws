@@ -180,19 +180,19 @@ WSGI_APPLICATION = 'awssheet.wsgi.application'
 STEAMPIPE_DATABASE_PASSWORD=os.environ.get('STEAMPIPE_DATABASE_PASSWORD', 'default-secret-key')
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-
     # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': 'steampipe',
-    #     'USER': 'steampipe',
-    #     'PASSWORD': STEAMPIPE_DATABASE_PASSWORD,
-    #     'HOST': '127.0.0.1',
-    #     'PORT': '9193',
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
     # }
+
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'steampipe',
+        'USER': 'steampipe',
+        'PASSWORD': STEAMPIPE_DATABASE_PASSWORD,
+        'HOST': '127.0.0.1',
+        'PORT': '9193',
+    }
 }
 
 
