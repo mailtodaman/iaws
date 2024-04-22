@@ -136,8 +136,8 @@ def add_task(request):
    
 			# schedule input will be in minutes 
 			schedul_time = int(task.schedule)
-			schedule.every(schedul_time).seconds.do(task_result_view,task)
-			# schedule.every(schedul_time).minutes.do(task_result_view,task)
+			# schedule.every(schedul_time).seconds.do(task_result_view,task)
+			schedule.every(schedul_time).minutes.do(task_result_view,task)
 			return redirect('list_tasks')
 	else:
 		form = ScheduledTaskForm()
